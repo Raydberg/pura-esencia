@@ -33,12 +33,13 @@
     --color-card: hsl(var(--card));
     --color-card-foreground: hsl(var(--card-foreground));
 
-    --color-rose-gold: hsl(var(--rose-gold));
-    --color-rose-gold-light: hsl(var(--rose-gold-light));
-    --color-rose-gold-dark: hsl(var(--rose-gold-dark));
-    --color-blush: hsl(var(--blush));
+    /* Custom colors for Bella Rosa */
+    --color-sage: hsl(var(--sage));
+    --color-sage-light: hsl(var(--sage-light));
+    --color-sage-dark: hsl(var(--sage-dark));
+    --color-sky: hsl(var(--sky));
     --color-cream: hsl(var(--cream));
-    --color-gold: hsl(var(--gold));
+    --color-forest: hsl(var(--forest));
 
     --color-sidebar: hsl(var(--sidebar-background));
     --color-sidebar-foreground: hsl(var(--sidebar-foreground));
@@ -142,81 +143,85 @@
     }
 
     :root {
-        --background: 0 0% 100%;
-        --foreground: 0 0% 15%;
+        /* Bella Rosa Studio - Paleta Verde Salvia Elegante */
+        --background: 80 25% 97%;
+        --foreground: 86 20% 18%;
 
-        --card: 0 0% 100%;
-        --card-foreground: 0 0% 15%;
+        --card: 80 20% 98%;
+        --card-foreground: 86 20% 18%;
 
-        --popover: 0 0% 100%;
-        --popover-foreground: 0 0% 15%;
+        --popover: 80 20% 98%;
+        --popover-foreground: 86 20% 18%;
 
-        --primary: 350 60% 70%;
-        --primary-foreground: 0 0% 100%;
+        /* Primary: Verde salvia #C1D5A8 = hsl(86, 35%, 75%) */
+        --primary: 86 40% 55%;
+        --primary-foreground: 80 25% 98%;
 
-        --secondary: 20 30% 95%;
-        --secondary-foreground: 0 0% 25%;
+        --secondary: 80 25% 92%;
+        --secondary-foreground: 86 25% 25%;
 
-        --muted: 20 20% 96%;
-        --muted-foreground: 0 0% 45%;
+        --muted: 80 20% 93%;
+        --muted-foreground: 86 15% 40%;
 
-        --accent: 30 50% 85%;
-        --accent-foreground: 0 0% 20%;
+        /* Accent: Crema dorado #F2E8CC */
+        --accent: 44 55% 87%;
+        --accent-foreground: 86 20% 18%;
 
-        --destructive: 0 84.2% 60.2%;
-        --destructive-foreground: 0 0% 100%;
+        --destructive: 0 70% 55%;
+        --destructive-foreground: 80 25% 98%;
 
-        --border: 20 20% 90%;
-        --input: 20 20% 90%;
-        --ring: 350 60% 70%;
+        --border: 86 25% 85%;
+        --input: 86 20% 88%;
+        --ring: 86 40% 55%;
 
         --radius: 0.75rem;
 
         /* Custom colors for Bella Rosa */
-        --rose-gold: 350 60% 70%;
-        --rose-gold-light: 350 50% 85%;
-        --rose-gold-dark: 350 50% 55%;
-        --blush: 20 40% 97%;
-        --cream: 30 30% 95%;
-        --gold: 40 70% 60%;
+        --sage: 86 35% 75%;
+        --sage-light: 86 30% 88%;
+        --sage-dark: 86 35% 45%;
+        --sky: 197 62% 90%;
+        --cream: 44 55% 87%;
+        --forest: 86 40% 35%;
     }
 
     .dark {
-        --background: 350 20% 8%;
-        --foreground: 30 20% 95%;
+        /* Dark mode - Verde salvia elegante */
+        --background: 86 20% 8%;
+        --foreground: 80 25% 95%;
 
-        --card: 350 15% 12%;
-        --card-foreground: 30 20% 95%;
+        --card: 86 18% 12%;
+        --card-foreground: 80 25% 95%;
 
-        --popover: 350 15% 12%;
-        --popover-foreground: 30 20% 95%;
+        --popover: 86 18% 12%;
+        --popover-foreground: 80 25% 95%;
 
-        --primary: 350 55% 65%;
-        --primary-foreground: 350 20% 8%;
+        --primary: 86 45% 60%;
+        --primary-foreground: 86 20% 10%;
 
-        --secondary: 350 15% 18%;
-        --secondary-foreground: 30 20% 90%;
+        --secondary: 86 15% 18%;
+        --secondary-foreground: 80 25% 90%;
 
-        --muted: 350 10% 20%;
-        --muted-foreground: 30 15% 65%;
+        --muted: 86 12% 20%;
+        --muted-foreground: 80 20% 65%;
 
-        --accent: 30 30% 25%;
-        --accent-foreground: 30 20% 95%;
+        --accent: 44 40% 25%;
+        --accent-foreground: 80 25% 95%;
 
         --destructive: 0 62.8% 50%;
         --destructive-foreground: 0 0% 95%;
 
-        --border: 350 15% 20%;
-        --input: 350 15% 20%;
-        --ring: 350 55% 65%;
+        --border: 86 15% 22%;
+        --input: 86 15% 22%;
+        --ring: 86 45% 60%;
 
         /* Dark mode custom colors */
-        --rose-gold: 350 55% 65%;
-        --rose-gold-light: 350 40% 45%;
-        --rose-gold-dark: 350 45% 55%;
-        --blush: 350 20% 15%;
-        --cream: 30 20% 18%;
-        --gold: 40 60% 50%;
+        --sage: 86 40% 55%;
+        --sage-light: 86 30% 40%;
+        --sage-dark: 86 35% 65%;
+        --sky: 197 40% 35%;
+        --cream: 44 35% 25%;
+        --forest: 86 35% 50%;
     }
 
     * {

@@ -2,13 +2,11 @@
 import Layout from "../layouts/Layout.astro";
 import { supabase } from "../core/lib/supabase";
 import ContactSection from "../shared/components/ContactSection.astro";
-import ServiceSection from "../shared/components/ServiceSection.astro";
 import NewArrivals from "../shared/components/NewArrivals.astro";
 import BenefitsItems from "../shared/components/BenefitsItems.astro";
 import CategoriesSection from "../shared/components/CategoriesSection.astro";
 import FloatingElements from "../shared/components/FloatingElements.astro";
 import ArrowRightIcon from "../shared/icons/ArrowRightIcon.astro";
-import GiftIcon from "../shared/icons/GiftIcon.astro";
 
 const { data: products } = await supabase
 	.from("products")
@@ -76,13 +74,7 @@ const { data: products } = await supabase
 							Ver Productos
 							<ArrowRightIcon />
 						</a>
-						<a
-							href="/services"
-							class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-11 px-8 group"
-						>
-							<GiftIcon />
-							Servicios Creativos
-						</a>
+						
 					</div>
 				</div>
 			</div>
@@ -95,7 +87,6 @@ const { data: products } = await supabase
 		{products && products.length > 0 && <NewArrivals products={products} />}
 	</div>
 
-	<ServiceSection />
 	<ContactSection
 		title="¿Buscas algo especial?"
 		description="Contáctanos por WhatsApp y te ayudaremos a encontrar el producto perfecto para ti o a crear algo único para tu ocasión especial."
