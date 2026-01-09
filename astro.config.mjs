@@ -12,7 +12,7 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()]
   },
-  site: 'https://cosmeticos-catalogo.vercel.app',
+  site: 'https://pura-esencia.vercel.app',
   integrations: [solidJs(), sitemap()],
   adapter: vercel(),
   image: {
