@@ -1,0 +1,346 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { supabase } from "../../core/lib/supabase";
+import ProductCard from "../../shared/components/ProductCard.astro";
+import { Image } from "astro:assets";
+
+export async function getStaticPaths() {
+    const { data: products } = await supabase
+        .from("products")
+        .select(`*, categories:category_id (id, name)`)
+        .is("deleted_at", null);
+
+    if (!products) {
+        console.log("No products found or error loading products");
+        return [];
+    }
+
+    return products.map((product) => {
+        const relatedProducts = products
+            .filter(
+                (p) =>
+                    p.category_id === product.category_id &&
+                    p.id !== product.id,
+            )
+            .slice(0, 4);
+
+        const slug = product.slug || product.id?.toString();
+        return {
+            params: { slug: slug || "unknown" },
+            props: { product, relatedProducts },
+        };
+    });
+}
+
+const { product, relatedProducts } = Astro.props;
+
+const formattedPrice = new Intl.NumberFormat("es-PE", {
+    style: "currency",
+    currency: "PEN",
+}).format(product.price);
+
+const images =
+    Array.isArray(product.imagenes) && product.imagenes.length > 0
+        ? product.imagenes
+        : product.image_url
+          ? [product.image_url]
+          : [];
+
+const hasImages = images.length > 0;
+
+const specifications = product.specifications || {};
+const features = Object.entries(specifications).map(
+    ([key, value]) => `${key}: ${value}`,
+);
+
+const isNew =
+    new Date(product.created_at).getTime() >
+    Date.now() - 30 * 24 * 60 * 60 * 1000;
+---
+
+<Layout title={product.name}>
+    <div class="min-h-screen flex flex-col bg-background font-sans">
+        <!-- Breadcrumb -->
+        <div class="container py-4">
+            <div
+                class="flex items-center gap-2 text-sm text-muted-foreground overflow-x-auto whitespace-nowrap"
+            >
+                <a href="/" class="hover:text-primary transition-colors"
+                    >Inicio</a
+                >
+                <span>/</span>
+                <a href="/products" class="hover:text-primary transition-colors"
+                    >Catálogo</a
+                >
+                <span>/</span>
+                <a
+                    href={`/products?categoria=${product.categories?.id || ""}`}
+                    class="hover:text-primary transition-colors capitalize"
+                >
+                    {product.categories?.name || "General"}
+                </a>
+                <span>/</span>
+                <span class="text-foreground font-medium truncate"
+                    >{product.name}</span
+                >
+            </div>
+        </div>
+
+        <section class="py-8">
+            <div class="container">
+                <div class="grid lg:grid-cols-2 gap-10">
+                    <div class="space-y-4 animate-fade-in">
+                        <div
+                            class="relative aspect-square bg-secondary/20 rounded-2xl overflow-hidden border border-border/50 shadow-sm group"
+                        >
+                            {
+                                hasImages ? (
+                                    <Image
+                                        id="main-image"
+                                        src={images[0]}
+                                        alt={product.name}
+                                        width={600}
+                                        height={600}
+                                        transition:name={`image-${product.slug || product.id}`}
+                                        class="object-contain w-full h-full transition-transform duration-500 group-hover:scale-105"
+                                    />
+                                ) : null
+                            }
+                            <div
+                                class="w-full h-full flex items-center justify-center text-muted-foreground bg-secondary/20 top-0 absolute"
+                                style={hasImages
+                                    ? "display: none;"
+                                    : "display: flex;"}
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="64"
+                                    height="64"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1"
+                                    class="opacity-20"
+                                >
+                                    <rect
+                                        width="18"
+                                        height="18"
+                                        x="3"
+                                        y="3"
+                                        rx="2"
+                                        ry="2"></rect>
+                                    <circle cx="9" cy="9" r="2"></circle>
+                                    <path
+                                        d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"
+                                    ></path>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- Thumbnails -->
+                        {
+                            images.length > 1 && (
+                                <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
+                                    {images.map(
+                                        (img: string, index: number) => (
+                                            <button
+                                                type="button"
+                                                class={`thumbnail-btn flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                                                    index === 0
+                                                        ? "border-primary ring-2 ring-primary/20"
+                                                        : "border-border hover:border-primary/50"
+                                                }`}
+                                                data-image={img}
+                                            >
+                                                <Image
+                                                    src={img}
+                                                    alt={`${product.name} thumbnail`}
+                                                    width={100}
+                                                    height={100}
+                                                    class="w-full h-full object-scale-down"
+                                                />
+                                            </button>
+                                        ),
+                                    )}
+                                </div>
+                            )
+                        }
+                    </div>
+
+                    <!-- Product Info -->
+                    <div class="animate-fade-in">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span
+                                class={`inline-flex items-center rounded-full border px-3 py-1 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${
+                                    product.stock > 0
+                                        ? "bg-primary/10 text-primary border-primary/20"
+                                        : "bg-muted text-muted-foreground border-border"
+                                }`}
+                            >
+                                {
+                                    product.stock > 0
+                                        ? `Disponibles: ${product.stock}`
+                                        : "Agotado"
+                                }
+                            </span>
+                        </div>
+
+                        <p
+                            class="text-sm text-muted-foreground uppercase tracking-wider mb-2"
+                        >
+                            {product.categories?.name || "Sin Categoría"}
+                        </p>
+
+                        <h1
+                            class="font-sans text-3xl md:text-4xl font-bold text-foreground mb-4"
+                        >
+                            {product.name}
+                        </h1>
+
+                        <p class="text-3xl font-bold text-primary mb-6">
+                            {formattedPrice}
+                        </p>
+
+                        <div
+                            class="prose prose-neutral dark:prose-invert max-w-none text-muted-foreground leading-relaxed mb-8"
+                        >
+                            <p>
+                                {
+                                    product.description ||
+                                        "Sin descripción disponible."
+                                }
+                            </p>
+                        </div>
+
+                        <!-- Features -->
+                        {
+                            features.length > 0 && (
+                                <div class="mb-8">
+                                    <h3 class="font-sans  text-lg font-semibold text-foreground mb-4">
+                                        Características
+                                    </h3>
+                                    <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        {features.map((feature) => (
+                                            <li class="flex items-start gap-2 text-sm text-muted-foreground">
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    width="24"
+                                                    height="24"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-width="2"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    class="w-4 h-4 text-primary flex-shrink-0 mt-0.5"
+                                                >
+                                                    <path d="M20 6 9 17l-5-5" />
+                                                </svg>
+                                                {feature}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )
+                        }
+
+                        <!-- CTA -->
+                        <div class="flex flex-col gap-4">
+                            <a
+                                href={`https://wa.me/51981713119?text=${encodeURIComponent(
+                                    `¡Hola! Me interesa el producto: ${product.name} (${formattedPrice}). ¿Podrías darme más información?`,
+                                )}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-4 rounded-lg font-bold text-lg transition-all hover:shadow-lg hover:scale-[1.02]"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill="currentColor"
+                                    class="w-6 h-6"
+                                >
+                                    <path
+                                        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"
+                                    ></path>
+                                </svg>
+                                Consultar por WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {
+            relatedProducts && relatedProducts.length > 0 && (
+                <section class="py-16 bg-secondary/30 border-t border-border/50">
+                    <div class="container">
+                        <h2 class="font-sans  text-2xl font-bold text-foreground mb-8">
+                            Productos Relacionados
+                        </h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {relatedProducts.map((p) => (
+                                <ProductCard product={p} />
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )
+        }
+    </div>
+</Layout>
+
+<script>
+    document.addEventListener("astro:page-load", () => {
+        const mainImage = document.getElementById(
+            "main-image",
+        ) as HTMLImageElement;
+        const thumbnails = document.querySelectorAll(".thumbnail-btn");
+
+        thumbnails.forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const imageUrl = btn.getAttribute("data-image");
+                if (mainImage && imageUrl) {
+                    // Simple fade effect
+                    mainImage.style.opacity = "0";
+
+                    setTimeout(() => {
+                        mainImage.src = imageUrl;
+                        mainImage.onload = () => {
+                            mainImage.style.opacity = "1";
+                        };
+                    }, 150);
+
+                    // Update active state
+                    thumbnails.forEach((t) => {
+                        t.classList.remove(
+                            "border-primary",
+                            "ring-2",
+                            "ring-primary/20",
+                        );
+                        t.classList.add("border-border");
+                    });
+                    btn.classList.remove("border-border");
+                    btn.classList.add(
+                        "border-primary",
+                        "ring-2",
+                        "ring-primary/20",
+                    );
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+    .scrollbar-none::-webkit-scrollbar {
+        display: none;
+    }
+    .scrollbar-none {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+</style>

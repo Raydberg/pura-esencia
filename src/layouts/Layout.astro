@@ -1,0 +1,92 @@
+---
+import { ClientRouter } from "astro:transitions";
+import "../styles/global.css";
+import Header from "../shared/components/Header.astro";
+import Footer from "../shared/components/Footer.astro";
+import WhatsAppButton from "../shared/components/WhatsAppButton.astro";
+import Analytics from "@vercel/analytics/astro";
+interface Props {
+	title: string;
+	description?: string;
+}
+
+const { title, description } = Astro.props;
+const defaultDescription = "Bella Rosa - Cosmeticos de calidad";
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="color-scheme" content="light dark" />
+
+		<ClientRouter />
+
+		<title>{title}</title>
+		<meta name="description" content={description || defaultDescription} />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={Astro.url} />
+		<meta property="og:title" content={title} />
+		<meta property="og:site_name" content="Bella Rosa" />
+		<meta property="og:locale" content="es_ES" />
+		<meta
+			property="og:description"
+			content={description || defaultDescription}
+		/>
+
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:image:alt" content={title} />
+
+		<!-- Twitter -->
+		<meta property="twitter:card" content="summary_large_image" />
+		<meta property="twitter:url" content={Astro.url} />
+		<meta property="twitter:title" content={title} />
+		<meta
+			property="twitter:description"
+			content={description || defaultDescription}
+		/>
+		<link rel="sitemap" href="/sitemap-index.xml" />
+		<!-- Fuentes -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+
+		<!-- <Analytics /> -->
+		<script is:inline>
+			function applyTheme() {
+				const isDark =
+					localStorage.theme === "dark" ||
+					(!("theme" in localStorage) &&
+						window.matchMedia("(prefers-color-scheme: dark)")
+							.matches);
+				document.documentElement.classList[isDark ? "add" : "remove"](
+					"dark",
+				);
+			}
+			applyTheme();
+			document.addEventListener("astro:after-swap", applyTheme);
+		</script>
+	</head>
+	<body>
+		<Header />
+		<slot />
+		<Footer />
+		<WhatsAppButton />
+	</body>
+</html>
+
+<style>
+	html,
+	body {
+		margin: 0;
+		width: 100%;
+		height: 100%;
+	}
+</style>

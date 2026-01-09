@@ -1,0 +1,27 @@
+---
+import WhatsAppIcon from "../icons/WhatsAppIcon.astro";
+
+interface WhatsAppButtonProps {
+    phoneNumber?: string;
+    message?: string;
+    productName?: string;
+}
+
+const { phoneNumber = '51981713119', message, productName } = Astro.props;
+const defaultMessage = productName
+    ? `¡Hola! Me interesa el producto: ${productName}. ¿Podrías darme más información?`
+    : "¡Hola! Me gustaría obtener más información sobre sus productos.";
+const finalMessage = message || defaultMessage;
+const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(finalMessage)}`;
+---
+
+<a
+    href={whatsappUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-[#25D366] hover:bg-[#128C7E] text-white px-4 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 animate-float"
+>
+    <WhatsAppIcon />
+    <span class="font-medium hidden sm:inline">Contáctanos</span>
+</a>
+    

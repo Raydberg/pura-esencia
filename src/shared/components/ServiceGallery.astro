@@ -1,0 +1,236 @@
+---
+import { Image } from "astro:assets";
+
+interface Props {
+    images: (string | ImageMetadata)[];
+    serviceName: string;
+}
+
+const { images, serviceName } = Astro.props;
+---
+
+<div class="service-gallery" data-images={JSON.stringify(images)}>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+        {
+            images.map((image, index) => (
+                <button
+                    type="button"
+                    class="group relative aspect-square rounded-xl overflow-hidden bg-muted cursor-pointer border-none p-0 w-full gallery-trigger"
+                    data-index={index}
+                    aria-label={`Ver imagen ${index + 1} de ${serviceName}`}
+                >
+                    <Image
+                        src={image as any}
+                        alt={`${serviceName} - ejemplo ${index + 1}`}
+                        width={400}
+                        height={400}
+                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+                        <span class="text-white opacity-0 group-hover:opacity-100 transition-opacity text-sm font-medium">
+                            Ver
+                        </span>
+                    </div>
+                </button>
+            ))
+        }
+    </div>
+
+    <!-- Modal / Dialog -->
+    <dialog
+        class="gallery-dialog bg-transparent p-0 w-full h-full max-w-none max-h-none backdrop:bg-background/95 backdrop:backdrop-blur-sm m-0 fixed inset-0 z-50"
+    >
+        <div
+            class="relative w-full h-full flex items-center justify-center p-4"
+        >
+            <button
+                type="button"
+                class="close-btn absolute top-4 right-4 z-50 p-2 rounded-full bg-background/80 hover:bg-background transition-colors text-foreground cursor-pointer"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    ><path d="M18 6 6 18"></path><path d="m6 6 12 12"
+                    ></path></svg
+                >
+            </button>
+
+            <div class="relative w-full max-w-4xl flex flex-col items-center">
+                <!-- Main Image -->
+                <img
+                    src=""
+                    alt="Active gallery image"
+                    class="active-image max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl animate-in fade-in zoom-in-95 duration-200"
+                />
+
+                <!-- Nav Buttons -->
+                {
+                    images.length > 1 && (
+                        <>
+                            <button
+                                type="button"
+                                class="prev-btn absolute left-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-background/80 hover:bg-background transition-colors text-foreground -ml-2 md:-ml-12 border border-border cursor-pointer shadow-sm"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path d="m15 18-6-6 6-6" />
+                                </svg>
+                            </button>
+                            <button
+                                type="button"
+                                class="next-btn absolute right-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-background/80 hover:bg-background transition-colors text-foreground -mr-2 md:-mr-12 border border-border cursor-pointer shadow-sm"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path d="m9 18 6-6-6-6" />
+                                </svg>
+                            </button>
+                        </>
+                    )
+                }
+
+                <!-- Dots -->
+                <div class="flex gap-2 mt-4 overflow-x-auto max-w-full py-2">
+                    {
+                        images.map((_, idx) => (
+                            <button
+                                type="button"
+                                data-index={idx}
+                                class="dots-btn w-2 h-2 rounded-full transition-colors shrink-0 bg-muted-foreground/30 hover:bg-primary cursor-pointer"
+                                aria-label={`Ir a la imagen ${idx + 1}`}
+                            />
+                        ))
+                    }
+                </div>
+            </div>
+        </div>
+    </dialog>
+</div>
+
+<script>
+    function setupGalleries() {
+        document.querySelectorAll(".service-gallery").forEach((gallery) => {
+            // Check if already initialized to avoid duplicate listeners on re-runs (if any)
+            if (gallery.hasAttribute("data-initialized")) return;
+            gallery.setAttribute("data-initialized", "true");
+
+            // Safe cast for Typescript satisfaction if needed, but in Astro script tag standard JS is fine
+            // @ts-ignore
+            const images = JSON.parse(gallery.dataset.images);
+            const dialog = gallery.querySelector("dialog");
+            const activeImage = gallery.querySelector(".active-image");
+            const triggers = gallery.querySelectorAll(".gallery-trigger");
+            const closeBtn = gallery.querySelector(".close-btn");
+            const prevBtn = gallery.querySelector(".prev-btn");
+            const nextBtn = gallery.querySelector(".next-btn");
+            const dots = gallery.querySelectorAll(".dots-btn");
+
+            let currentIndex = 0;
+
+            const getSrc = (img: any) => {
+                return typeof img === "string" ? img : img.src;
+            };
+
+            const showImage = (index: number) => {
+                if (index < 0) index = images.length - 1;
+                if (index >= images.length) index = 0;
+                currentIndex = index;
+
+                if (activeImage instanceof HTMLImageElement) {
+                    activeImage.style.opacity = "0.5";
+                    activeImage.src = getSrc(images[currentIndex]);
+                    // Fade in effect
+                    requestAnimationFrame(() => {
+                        activeImage.style.opacity = "1";
+                    });
+                }
+
+                dots.forEach((dot, i) => {
+                    if (i === currentIndex) {
+                        dot.classList.remove("bg-muted-foreground/30");
+                        dot.classList.add("bg-primary");
+                    } else {
+                        dot.classList.add("bg-muted-foreground/30");
+                        dot.classList.remove("bg-primary");
+                    }
+                });
+            };
+
+            triggers.forEach((trigger) => {
+                trigger.addEventListener("click", () => {
+                    // @ts-ignore
+                    const index = parseInt(trigger.dataset.index);
+                    showImage(index);
+                    if (dialog instanceof HTMLDialogElement) {
+                        dialog.showModal();
+                        document.body.style.overflow = "hidden"; // Prevent background scrolling
+                    }
+                });
+            });
+
+            const closeGallery = () => {
+                if (dialog instanceof HTMLDialogElement) {
+                    dialog.close();
+                    document.body.style.overflow = "";
+                }
+            };
+
+            closeBtn?.addEventListener("click", closeGallery);
+
+            // Close on backdrop click
+            dialog?.addEventListener("click", (e) => {
+                if (e.target === dialog) closeGallery();
+            });
+
+            prevBtn?.addEventListener("click", () =>
+                showImage(currentIndex - 1),
+            );
+            nextBtn?.addEventListener("click", () =>
+                showImage(currentIndex + 1),
+            );
+
+            dots.forEach((dot) => {
+                dot.addEventListener("click", () => {
+                    // @ts-ignore
+                    showImage(parseInt(dot.dataset.index));
+                });
+            });
+
+            // Keyboard navigation
+            dialog?.addEventListener("keydown", (e) => {
+                if (e.key === "ArrowLeft") showImage(currentIndex - 1);
+                if (e.key === "ArrowRight") showImage(currentIndex + 1);
+                if (e.key === "Escape") closeGallery();
+            });
+        });
+    }
+
+    // Run on load and astro navigation
+    setupGalleries();
+    document.addEventListener("astro:page-load", setupGalleries);
+</script>

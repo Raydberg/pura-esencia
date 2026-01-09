@@ -1,0 +1,390 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { supabase } from "../core/lib/supabase";
+import { Image } from "astro:assets";
+
+const { data: products } = await supabase
+    .from("products")
+    .select(`*, categories:category_id (id, name)`)
+    .is("deleted_at", null)
+    .order("created_at", { ascending: false });
+
+const { data: categories } = await supabase
+    .from("categories")
+    .select("*")
+    .order("name");
+
+const allCategories = categories || [];
+const allProducts = products || [];
+---
+
+<Layout title="Productos">
+    <div class="min-h-screen bg-background font-sans pb-20">
+        <div class="bg-primary/5 border-b border-border/50 py-12">
+            <div class="container text-center">
+                <h1
+                    class="font-sans  text-4xl md:text-5xl font-bold text-foreground mb-4"
+                >
+                    Nuestros Productos
+                </h1>
+                <p class="text-muted-foreground max-w-xl mx-auto">
+                    Explora nuestra colección completa de cosméticos y productos
+                    de belleza seleccionados para ti.
+                </p>
+            </div>
+        </div>
+
+        <div class="container mt-8 grid md:grid-cols-[240px_1fr] gap-8">
+            <aside class="space-y-6">
+                <div class="relative">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+                        ><circle cx="11" cy="11" r="8"></circle><path
+                            d="m21 21-4.3-4.3"></path></svg
+                    >
+                    <input
+                        type="text"
+                        id="search-input"
+                        placeholder="Buscar productos..."
+                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pl-9 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    />
+                </div>
+
+                <div>
+                    <h3 class="font-semibold mb-3 text-lg">Categorías</h3>
+                    <div class="flex flex-row md:flex-col gap-2 md:gap-1 overflow-x-auto pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide snap-x">
+                        <button
+                            data-category="all"
+                            class="category-btn whitespace-nowrap shrink-0 text-left px-3 py-2 rounded-md text-sm transition-colors hover:bg-accent hover:text-accent-foreground font-medium bg-secondary text-primary snap-start border border-border/50 md:border-transparent"
+                        >
+                            Todas
+                        </button>
+                        {
+                            allCategories.map((cat) => (
+                                <button
+                                    data-category={cat.id}
+                                    class="category-btn whitespace-nowrap shrink-0 text-left px-3 py-2 rounded-md text-sm transition-colors hover:bg-accent hover:text-accent-foreground text-muted-foreground snap-start border border-border/50 md:border-transparent"
+                                >
+                                    {cat.name}
+                                </button>
+                            ))
+                        }
+                    </div>
+                </div>
+            </aside>
+
+            <main>
+                <div
+                    id="results-count"
+                    class="text-sm text-muted-foreground mb-6 hidden"
+                >
+                    Mostrando resultados para "<span
+                        id="search-term-display"
+                        class="font-medium text-foreground"></span>"
+                </div>
+
+                <div
+                    id="product-grid"
+                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                >
+                    {
+                        allProducts.map((product) => {
+                            const image = Array.isArray(product.imagenes) && product.imagenes.length > 0 
+                                ? product.imagenes[0] 
+                                : (product.image_url || null);
+                                
+                            return (
+                            <a
+                                href={`/producto/${product.slug || product.id}`}
+                                class="product-item group relative block overflow-hidden rounded-2xl bg-card border border-border/50 shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1"
+                                data-category={product.category_id}
+                                data-name={product.name.toLowerCase()}
+                            >
+                                <!-- Product Image -->
+                                <div class="relative aspect-square overflow-hidden bg-secondary/20">
+                                    {image ? (
+                                        <Image
+                                            src={image}
+                                            alt={product.name}
+                                            width={300}
+                                            height={300}
+                                            class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                        />
+                                    ) : null}
+                                    
+                                    <!-- Placeholder / Fallback -->
+                                    <div class="absolute inset-0 flex items-center justify-center text-muted-foreground bg-secondary/20" style={image ? "display: none;" : "display: flex;"}>
+                                         <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="48"
+                                            height="48"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="1"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            class="opacity-20"
+                                        >
+                                            <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                                            <circle cx="9" cy="9" r="2" />
+                                            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                                        </svg>
+                                    </div>
+
+                                    <div class="absolute inset-0 bg-linear-to-t from-black/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                    
+                                    {product.stock < 1 && (
+                                        <div class="absolute top-3 left-3 z-10">
+                                            <span class="inline-flex items-center gap-1 rounded-full bg-destructive/90 px-2.5 py-1 text-xs font-bold text-destructive-foreground shadow-sm uppercase tracking-wider">
+                                                Agotado
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div class="p-5">
+                                    <span class="inline-block mb-2 text-[10px] font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                                        {product.categories?.name || "Sin categoría"}
+                                    </span>
+
+                                    <h3 class="font-sans  font-semibold text-foreground text-lg mb-2 line-clamp-2 group-hover:text-primary transition-colors duration-200">
+                                        {product.name}
+                                    </h3>
+
+                                    <!-- Price -->
+                                    <div class="mt-4 flex items-end justify-between">
+                                        <span class="text-xl font-bold text-foreground">
+                                            {new Intl.NumberFormat("es-PE", {
+                                                style: "currency",
+                                                currency: "PEN",
+                                            }).format(product.price)}
+                                        </span>
+
+                                        <!-- View Details Arrow -->
+                                        <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-secondary text-muted-foreground group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-200">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="16"
+                                                height="16"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="2"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                            >
+                                                <path d="m9 18 6-6-6-6" />
+                                            </svg>
+                                        </span>
+                                    </div>
+                                </div>
+                            </a>
+                        )})
+                    }
+                </div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="hidden py-20 text-center">
+                    <div
+                        class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="text-muted-foreground"
+                            ><circle cx="11" cy="11" r="8"></circle><path
+                                d="m21 21-4.3-4.3"></path></svg
+                        >
+                    </div>
+                    <h3 class="text-lg font-medium text-foreground">
+                        No se encontraron productos
+                    </h3>
+                    <p class="text-muted-foreground">
+                        Intenta con otros términos o categoría.
+                    </p>
+                    <button
+                        id="clear-filters"
+                        class="mt-4 text-primary hover:underline font-medium"
+                    >
+                        Limpiar filtros
+                    </button>
+                </div>
+            </main>
+        </div>
+    </div>
+</Layout>
+
+<script>
+    function setupFilters() {
+        const searchInput = document.getElementById(
+            "search-input",
+        ) as HTMLInputElement;
+        const categoryBtns = document.querySelectorAll(".category-btn");
+        const productItems = document.querySelectorAll(".product-item");
+        const resultsCount = document.getElementById("results-count");
+        const searchTermDisplay = document.getElementById(
+            "search-term-display",
+        );
+        const emptyState = document.getElementById("empty-state");
+        const productGrid = document.getElementById("product-grid");
+        const clearFiltersBtn = document.getElementById("clear-filters");
+
+        let currentCategory = "all";
+        let currentSearch = "";
+
+        // Parse URL params on load
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlSearch = urlParams.get("buscar");
+        const urlCategory = urlParams.get("categoria");
+
+        if (urlSearch) {
+            currentSearch = urlSearch.toLowerCase();
+            searchInput.value = urlSearch;
+        }
+
+        if (urlCategory) {
+            currentCategory = urlCategory;
+            updateCategoryUI(currentCategory);
+        }
+
+        // Initial Filter
+        filterProducts();
+
+        // Event Listeners
+        searchInput?.addEventListener("input", (e) => {
+            currentSearch = (e.target as HTMLInputElement).value.toLowerCase();
+            // Update URL without refresh
+            const newUrl = new URL(window.location.href);
+            if (currentSearch) {
+                newUrl.searchParams.set("buscar", currentSearch);
+            } else {
+                newUrl.searchParams.delete("buscar");
+            }
+            window.history.replaceState({}, "", newUrl);
+
+            filterProducts();
+        });
+
+        categoryBtns.forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const category = btn.getAttribute("data-category");
+                if (category) {
+                    currentCategory = category;
+
+                    // Update URL without refresh
+                    const newUrl = new URL(window.location.href);
+                    if (currentCategory !== "all") {
+                        newUrl.searchParams.set("categoria", currentCategory);
+                    } else {
+                        newUrl.searchParams.delete("categoria");
+                    }
+                    window.history.replaceState({}, "", newUrl);
+
+                    updateCategoryUI(currentCategory);
+                    filterProducts();
+                }
+            });
+        });
+
+        clearFiltersBtn?.addEventListener("click", () => {
+            currentCategory = "all";
+            currentSearch = "";
+            searchInput.value = "";
+            updateCategoryUI("all");
+
+            // Clean URL
+            const newUrl = new URL(window.location.href);
+            newUrl.searchParams.delete("buscar");
+            newUrl.searchParams.delete("categoria");
+            window.history.replaceState({}, "", newUrl);
+
+            filterProducts();
+        });
+
+        function updateCategoryUI(activeCat: string) {
+            categoryBtns.forEach((btn) => {
+                const btnCat = btn.getAttribute("data-category");
+                if (btnCat === activeCat) {
+                    btn.classList.remove(
+                        "text-muted-foreground",
+                        "bg-transparent",
+                    );
+                    btn.classList.add(
+                        "bg-secondary",
+                        "text-primary",
+                        "font-medium",
+                    );
+                } else {
+                    btn.classList.add(
+                        "text-muted-foreground",
+                        "bg-transparent",
+                    );
+                    btn.classList.remove(
+                        "bg-secondary",
+                        "text-primary",
+                        "font-medium",
+                    );
+                }
+            });
+        }
+
+        function filterProducts() {
+            let visibleCount = 0;
+
+            productItems.forEach((item) => {
+                const itemCat = item.getAttribute("data-category");
+                const itemName = item.getAttribute("data-name");
+
+                const matchesCategory =
+                    currentCategory === "all" || itemCat === currentCategory;
+                const matchesSearch =
+                    !currentSearch ||
+                    (itemName && itemName.includes(currentSearch));
+
+                if (matchesCategory && matchesSearch) {
+                    item.classList.remove("hidden");
+                    visibleCount++;
+                } else {
+                    item.classList.add("hidden");
+                }
+            });
+
+            if (visibleCount === 0) {
+                productGrid?.classList.add("hidden");
+                emptyState?.classList.remove("hidden");
+            } else {
+                productGrid?.classList.remove("hidden");
+                emptyState?.classList.add("hidden");
+            }
+
+            // Show Search status
+            if (currentSearch && resultsCount && searchTermDisplay) {
+                resultsCount.classList.remove("hidden");
+                searchTermDisplay.textContent = currentSearch;
+            } else if (resultsCount) {
+                resultsCount.classList.add("hidden");
+            }
+        }
+    }
+
+    setupFilters();
+
+    document.addEventListener("astro:page-load", setupFilters);
+</script>

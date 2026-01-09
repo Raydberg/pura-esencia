@@ -1,0 +1,73 @@
+---
+import { supabase } from "../../core/lib/supabase";
+
+// Dictionary of icons for standard categories
+const ICON_MAP: Record<string, string> = {
+    maquillaje: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.4 17.5 7.6-7.6a3 3 0 0 0-4.2-4.2L8 13.5V18h4.4Z"/><path d="M4 14.5v3.6A2.5 2.5 0 0 0 6.5 20.6h0a2.5 2.5 0 0 0 2.5-2.5V14a2 2 0 0 0-2-2h-1a2 2 0 0 0-2 2.5Z"/></svg>`,
+    skincare: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>`,
+    labiales: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14 2 22"/><path d="M14 10 2 22"/><path d="m14 10 6.6-6.6a2.12 2.12 0 1 1 3 3L17 13"/><path d="m18 10 3 3"/><path d="M10 14h4v7h-4z"/></svg>`,
+    fragancias: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 22v-8a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v8"/><path d="M15 7a4 4 0 1 0-8 0"/><path d="M7 12h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2Z"/></svg>`,
+    default: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>`,
+};
+
+// Fetch categories
+const { data: dbCategories } = await supabase
+    .from("categories")
+    .select("id, name")
+    .limit(4);
+
+const categories = (dbCategories || []).map((cat) => {
+    // Basic normalization for matching: remove accents, lowercase
+    const normalized = cat.name
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+
+    let icon = ICON_MAP.default;
+    if (normalized.includes("maquillaje") || normalized.includes("makeup"))
+        icon = ICON_MAP.maquillaje;
+    else if (normalized.includes("piel") || normalized.includes("skin"))
+        icon = ICON_MAP.skincare;
+    else if (normalized.includes("labial") || normalized.includes("lip"))
+        icon = ICON_MAP.labiales;
+    else if (
+        normalized.includes("perfume") ||
+        normalized.includes("fragancia") ||
+        normalized.includes("aroma")
+    )
+        icon = ICON_MAP.fragancias;
+
+    return {
+        ...cat,
+        icon,
+    };
+});
+---
+
+<section class="py-16 bg-secondary/30">
+    <div class="container">
+        <h2
+            class="font-sans text-3xl font-bold text-foreground mb-10 text-center"
+        >
+            Nuestras Categorías 
+        </h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {
+                categories.map((cat) => (
+                    <a
+                        href={`/products?categoria=${cat.id}`}
+                        class="group bg-card hover:bg-primary/5 rounded-xl p-6 text-center border border-border/50 hover:border-primary/30 transition-all hover:shadow-lg hover:-translate-y-1 duration-300 flex flex-col items-center justify-center gap-3"
+                    >
+                        <div
+                            class="text-primary w-10 h-10 [&>svg]:w-full [&>svg]:h-full group-hover:scale-110 transition-transform duration-300"
+                            set:html={cat.icon}
+                        />
+                        <h3 class="font-sans font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
+                            {cat.name}
+                        </h3>
+                    </a>
+                ))
+            }
+        </div>
+    </div>
+</section>

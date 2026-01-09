@@ -1,0 +1,95 @@
+---
+import PaletteIcon from "../icons/PaletteIcon.astro";
+import PencilIcon from "../icons/PencilIcon.astro";
+
+const services = [
+    {
+        id: "srv-001",
+        name: "Manualidades creativas",
+        category: "goma-eva",
+        description:
+            "Creamos hermosas manualidades personalizadas en goma eva (foami/microporoso) para todo tipo de ocasiones: cumpleaños, baby showers, fiestas infantiles, decoración escolar y más. Cada pieza es hecha a mano con amor y atención al detalle.",
+        examples: [
+            "Decoración para fiestas temáticas",
+            "Letras y nombres decorativos",
+            "Muñecos y figuras fofuchas",
+            "Material didáctico escolar",
+            "Recuerdos para eventos",
+        ],
+        icon: PaletteIcon,
+    },
+    {
+        id: "srv-002",
+        name: "Creación de Maquetas",
+        category: "maquetas",
+        description:
+            "Diseñamos y construimos maquetas profesionales para proyectos escolares, universitarios y presentaciones. Trabajamos con diversos materiales y técnicas para lograr resultados impresionantes y detallados.",
+        examples: [
+            "Proyectos escolares",
+            "Maquetas de ciencias",
+            "Dioramas históricos",
+            "Maquetas temáticas",
+        ],
+        icon: PencilIcon,
+    },
+];
+---
+
+<section class="py-16">
+    <div class="container">
+        <div class="text-center mb-10">
+            <span class="text-primary text-sm font-medium"
+                >Creatividad Personalizada</span
+            >
+            <h2 class="font-sans text-3xl font-bold text-foreground mt-1">
+                Nuestros Servicios
+            </h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {
+                services.map((service) => {
+                    const Icon = service.icon;
+                    return (
+                        <div
+                            accesskey={service.id}
+                            class="group bg-card rounded-2xl p-6 border border-border/50 hover:border-primary/30 transition-all hover:shadow-lg"
+                        >
+                            <div class="flex items-start gap-4">
+                                <div class="p-2 bg-primary/10 rounded-lg text-primary">
+                                    <Icon class="w-8 h-8" />
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-sans text-xl font-semibold text-foreground group-hover:text-primary transition-colors">
+                                        {service.name}
+                                    </h3>
+                                    <p class="text-muted-foreground mt-2 text-sm">
+                                        {service.description}
+                                    </p>
+                                    <div class="flex flex-wrap gap-2 mt-3">
+                                        {service.examples
+                                            .slice(0, 3)
+                                            .map((example, i) => (
+                                                <span
+                                                    accesskey={
+                                                        service.id + "-" + i
+                                                    }
+                                                    class="text-xs bg-secondary px-2 py-1 rounded-full text-muted-foreground"
+                                                >
+                                                    {example}
+                                                </span>
+                                            ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })
+            }
+        </div>
+        <div class="text-center mt-8">
+            <button class="btn btn-outline">
+                <a href="/services"> Ver todos los servicios </a>
+            </button>
+        </div>
+    </div>
+</section>

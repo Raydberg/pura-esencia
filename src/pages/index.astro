@@ -1,0 +1,103 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { supabase } from "../core/lib/supabase";
+import ContactSection from "../shared/components/ContactSection.astro";
+import ServiceSection from "../shared/components/ServiceSection.astro";
+import NewArrivals from "../shared/components/NewArrivals.astro";
+import BenefitsItems from "../shared/components/BenefitsItems.astro";
+import CategoriesSection from "../shared/components/CategoriesSection.astro";
+import FloatingElements from "../shared/components/FloatingElements.astro";
+import ArrowRightIcon from "../shared/icons/ArrowRightIcon.astro";
+import GiftIcon from "../shared/icons/GiftIcon.astro";
+
+const { data: products } = await supabase
+	.from("products")
+	.select(`*, categories:category_id (id, name)`)
+	.is("deleted_at", null)
+	.order("created_at", { ascending: false })
+	.limit(4);
+---
+
+<Layout title="Inicio">
+	<div class="min-h-screen flex flex-col bg-background font-sans">
+		<section class="relative py-20 md:py-32 overflow-hidden">
+			<FloatingElements />
+
+			<div class="container relative z-10">
+				<div class="max-w-2xl mx-auto text-center">
+					<div
+						class="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6 animate-fade-in"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="16"
+							height="16"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							><path
+								d="m12 3-1.9 5.8a2 2 0 0 1-1.287 1.288L3 12l5.8 1.9a2 2 0 0 1 1.288 1.287L12 21l1.9-5.8a2 2 0 0 1 1.287-1.288L21 12l-5.8-1.9a2 2 0 0 1-1.288-1.287Z"
+							></path></svg
+						>
+						Belleza y Creatividad
+					</div>
+					<h1
+						class="font-sans text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight animate-fade-in"
+						style="animation-delay: 100ms;"
+					>
+						Descubre tu <span
+							class="text-primary relative inline-block"
+						>
+							belleza natural
+							<span
+								class="absolute -bottom-2 left-0 w-full h-1 bg-linear-to-r from-primary/50 to-transparent rounded-full"
+							></span>
+						</span>
+					</h1>
+					<p
+						class="text-lg text-muted-foreground mb-8 max-w-lg mx-auto animate-fade-in"
+						style="animation-delay: 200ms;"
+					>
+						Productos de belleza seleccionados con amor y servicios
+						creativos personalizados para hacer brillar cada momento
+						especial.
+					</p>
+					<div
+						class="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in"
+						style="animation-delay: 300ms;"
+					>
+						<a
+							href="/products"
+							class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-11 px-8 bg-primary text-primary-foreground hover:bg-primary/90 group"
+						>
+							Ver Productos
+							<ArrowRightIcon />
+						</a>
+						<a
+							href="/services"
+							class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-11 px-8 group"
+						>
+							<GiftIcon />
+							Servicios Creativos
+						</a>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<BenefitsItems />
+
+		<CategoriesSection />
+
+		{products && products.length > 0 && <NewArrivals products={products} />}
+	</div>
+
+	<ServiceSection />
+	<ContactSection
+		title="¿Buscas algo especial?"
+		description="Contáctanos por WhatsApp y te ayudaremos a encontrar el producto perfecto para ti o a crear algo único para tu ocasión especial."
+	/>
+</Layout>

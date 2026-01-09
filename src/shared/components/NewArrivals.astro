@@ -1,0 +1,48 @@
+---
+import ProductCard from "./ProductCard.astro";
+import StartsIcon from "../icons/StartsIcon.astro";
+
+const { products } = Astro.props;
+---
+
+<section class="py-16 bg-secondary/20">
+    <div class="container">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <span class="text-primary text-sm font-medium"
+                    >Recién llegados</span
+                >
+                <div class="flex items-center gap-2">
+                    <h2 class="font-sans text-3xl font-bold text-foreground">
+                        Lo Nuevo
+                    </h2>
+                    <StartsIcon class="w-8 h-8 text-primary" />
+                </div>
+            </div>
+            <a
+                href="/products"
+                class="text-sm text-primary hover:underline flex items-center gap-1 group"
+            >
+                Ver más
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="w-4 h-4 group-hover:translate-x-1 transition-transform"
+                >
+                    <path d="M5 12h14"></path>
+                    <path d="m12 5 7 7-7 7"></path>
+                </svg>
+            </a>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {products.map((product) => <ProductCard product={product} />)}
+        </div>
+    </div>
+</section>

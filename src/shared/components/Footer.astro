@@ -1,0 +1,98 @@
+---
+import { supabase } from "../../core/lib/supabase";
+import HeartIcon from "../icons/HeartIcon.astro";
+
+const { data: categories } = await supabase
+    .from("categories")
+    .select("*")
+    .order("name")
+    .limit(5);
+---
+
+<footer class="bg-secondary/50 border-t border-border mt-auto">
+    <div class="container py-12">
+        <div
+            class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left"
+        >
+            <!-- Brand -->
+            <div>
+                <a
+                    href="/"
+                    class="flex items-center gap-2 mb-4 justify-center md:justify-start"
+                >
+                    <span class="text-2xl">🌸</span>
+                    <span class="font-sans text-xl font-semibold">
+                        Bella Rosa <span class="text-primary">Studio</span>
+                    </span>
+                </a>
+                <p class="text-sm text-muted-foreground">
+                    Tu destino para productos de belleza y creatividad. Calidad
+                    y elegancia en cada detalle.
+                </p>
+            </div>
+
+            <div>
+                <h4 class="font-sans text-lg font-semibold mb-4">Enlaces</h4>
+                <ul class="space-y-2">
+                    <li>
+                        <a
+                            href="/"
+                            class="font-sans text-sm text-muted-foreground hover:text-primary transition-colors"
+                        >
+                            Inicio
+                        </a>
+                    </li>
+                    <li>
+                        <a
+                            href="/products"
+                            class="font-sans text-sm text-muted-foreground hover:text-primary transition-colors"
+                        >
+                            Catálogo
+                        </a>
+                    </li>
+                    <li>
+                        <a
+                            href="/servicios"
+                            class="font-sans text-sm text-muted-foreground hover:text-primary transition-colors"
+                        >
+                            Servicios Creativos
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-sans text-lg font-semibold mb-4">Categorías</h4>
+                <ul class="space-y-2">
+                    {
+                        categories?.map((category) => (
+                            <li>
+                                <a
+                                    href={`/products?categoria=${category.id}`}
+                                    class="font-sans text-sm text-muted-foreground hover:text-primary transition-colors capitalize"
+                                >
+                                    {category.name}
+                                </a>
+                            </li>
+                        ))
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <div class="border-t border-border mt-8 pt-8 text-center">
+            <p
+                class="text-sm text-muted-foreground flex items-center justify-center gap-1"
+            >
+                Hecho con
+                <HeartIcon
+                    class="w-4 h-4 text-primary fill-primary animate-pulse"
+                />
+                por <a
+                    href="https://www.linkedin.com/in/raydbergchuquival"
+                    class="underline">Raydberg Chuquival</a
+                >
+            </p>
+        </div>
+    </div>
+</footer>
