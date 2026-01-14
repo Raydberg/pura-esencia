@@ -1,7 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import tailwindcss from "@tailwindcss/vite";
-import solidJs from '@astrojs/solid-js';
 
 import vercel from '@astrojs/vercel';
 
@@ -13,7 +12,7 @@ export default defineConfig({
     plugins: [tailwindcss()]
   },
   site: 'https://pura-esencia.vercel.app',
-  integrations: [solidJs(), sitemap()],
+  integrations: [ sitemap()],
   adapter: vercel(),
   image: {
     remotePatterns: [
