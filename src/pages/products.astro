@@ -102,14 +102,17 @@ const allProducts = products || [];
                     class="grid grid-cols-2 lg:grid-cols-3 gap-2 md:gap-6"
                 >
                     {
-                        allProducts.map((product) => {
+                        allProducts.map((product, index) => {
                             return (
                                 <div
                                     class="product-item"
                                     data-category={product.category_id}
                                     data-name={product.name.toLowerCase()}
                                 >
-                                    <ProductCard product={product} />
+                                    <ProductCard
+                                        product={product}
+                                        loading={index < 6 ? "eager" : "lazy"}
+                                    />
                                 </div>
                             );
                         })

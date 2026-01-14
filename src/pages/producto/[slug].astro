@@ -3,6 +3,7 @@ import Layout from "../../layouts/Layout.astro";
 import { supabase } from "../../core/lib/supabase";
 import ProductCard from "../../shared/components/ProductCard.astro";
 import { Image } from "astro:assets";
+import { formattedPrice } from "../../core/utils/formattedPrice";
 
 export async function getStaticPaths() {
     const { data: products } = await supabase
@@ -34,10 +35,6 @@ export async function getStaticPaths() {
 
 const { product, relatedProducts } = Astro.props;
 
-const formattedPrice = new Intl.NumberFormat("es-PE", {
-    style: "currency",
-    currency: "PEN",
-}).format(product.price);
 
 const images =
     Array.isArray(product.imagenes) && product.imagenes.length > 0
@@ -198,7 +195,7 @@ const isNew =
                         </h1>
 
                         <p class="text-3xl font-bold text-primary mb-6">
-                            {formattedPrice}
+                            {formattedPrice(product.price)}
                         </p>
 
                         <div
@@ -248,7 +245,7 @@ const isNew =
                         <div class="flex flex-col gap-4">
                             <a
                                 href={`https://wa.me/51935614471?text=${encodeURIComponent(
-                                    `¡Hola! Me interesa el producto: ${product.name} (${formattedPrice}). ¿Podrías darme más información?`,
+                                    `¡Hola! Me interesa el producto: ${product.name} (${formattedPrice(product.price)}). ¿Podrías darme más información?`,
                                 )}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
