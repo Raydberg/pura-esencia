@@ -1,0 +1,105 @@
+---
+import ProductCard from "./ProductCard.astro";
+
+interface Props {
+    products: any[];
+}
+
+const { products } = Astro.props;
+---
+
+<section class="py-16 bg-secondary/30 border-t border-border/50">
+    <div class="container relative group">
+        <div class="flex items-center justify-between mb-8">
+            <h2 class="font-sans text-2xl font-bold text-foreground">
+                Productos Relacionados
+            </h2>
+
+            <!-- Navigation Buttons (Desktop) -->
+            <div class="hidden md:flex gap-2">
+                <button
+                    id="prev-slide"
+                    class="p-2 rounded-full border border-border bg-background hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label="Previous slide"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path d="m15 18-6-6 6-6"></path>
+                    </svg>
+                </button>
+                <button
+                    id="next-slide"
+                    class="p-2 rounded-full border border-border bg-background hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label="Next slide"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path d="m9 18 6-6-6-6"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Carousel Container -->
+        <div
+            id="carousel-container"
+            class="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0"
+        >
+            {
+                products.map((p) => (
+                    <div class="min-w-[280px] max-w-[280px] sm:min-w-[300px] sm:max-w-[300px] snap-center">
+                        <ProductCard product={p} class="h-full" />
+                    </div>
+                ))
+            }
+        </div>
+    </div>
+</section>
+
+<style>
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+</style>
+
+<script>
+    document.addEventListener("astro:page-load", () => {
+        const container = document.getElementById("carousel-container");
+        const prevBtn = document.getElementById("prev-slide");
+        const nextBtn = document.getElementById("next-slide");
+
+        if (!container || !prevBtn || !nextBtn) return;
+
+        const scrollAmount = 320; // Card width + gap
+
+        prevBtn.addEventListener("click", () => {
+            container.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+        });
+
+        nextBtn.addEventListener("click", () => {
+            container.scrollBy({ left: scrollAmount, behavior: "smooth" });
+        });
+    });
+</script>

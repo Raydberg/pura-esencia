@@ -2,6 +2,7 @@
 import Layout from "../../layouts/Layout.astro";
 import { supabase } from "../../core/lib/supabase";
 import ProductCard from "../../shared/components/ProductCard.astro";
+import RelatedProducts from "../../shared/components/RelatedProducts.astro";
 import { Image } from "astro:assets";
 import { formattedPrice } from "../../core/utils/formattedPrice";
 
@@ -17,13 +18,9 @@ export async function getStaticPaths() {
     }
 
     return products.map((product) => {
-        const relatedProducts = products
-            .filter(
-                (p) =>
-                    p.category_id === product.category_id &&
-                    p.id !== product.id,
-            )
-            .slice(0, 4);
+        const relatedProducts = products.filter(
+            (p) => p.category_id === product.category_id && p.id !== product.id,
+        );
 
         const slug = product.slug || product.id?.toString();
         return {
@@ -34,7 +31,6 @@ export async function getStaticPaths() {
 }
 
 const { product, relatedProducts } = Astro.props;
-
 
 const images =
     Array.isArray(product.imagenes) && product.imagenes.length > 0
@@ -273,18 +269,7 @@ const isNew =
 
         {
             relatedProducts && relatedProducts.length > 0 && (
-                <section class="py-16 bg-secondary/30 border-t border-border/50">
-                    <div class="container">
-                        <h2 class="font-sans  text-2xl font-bold text-foreground mb-8">
-                            Productos Relacionados
-                        </h2>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {relatedProducts.map((p) => (
-                                <ProductCard product={p} />
-                            ))}
-                        </div>
-                    </div>
-                </section>
+                <RelatedProducts products={relatedProducts} />
             )
         }
     </div>
