@@ -1,0 +1,179 @@
+---
+interface Props {
+    placeholder?: string;
+    id?: string;
+    class?: string;
+}
+
+const {
+    placeholder = "Buscar productos...",
+    id = "search-input",
+    class: className = "",
+} = Astro.props;
+---
+
+<div class="relative search-input-wrapper">
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+    >
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="m21 21-4.3-4.3"></path>
+    </svg>
+    <input
+        type="text"
+        id={id}
+        placeholder={placeholder}
+        class:list={[
+            "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pl-9 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+            className,
+        ]}
+    />
+</div>
+
+<script>
+    function levenshteinDistance(str1: string, str2: string): number {
+        const m = str1.length;
+        const n = str2.length;
+
+        const dp: number[][] = Array(m + 1)
+            .fill(null)
+            .map(() => Array(n + 1).fill(0));
+
+        for (let i = 0; i <= m; i++) {
+            dp[i][0] = i;
+        }
+
+        for (let j = 0; j <= n; j++) {
+            dp[0][j] = j;
+        }
+
+        for (let i = 1; i <= m; i++) {
+            for (let j = 1; j <= n; j++) {
+                if (str1[i - 1] === str2[j - 1]) {
+                    dp[i][j] = dp[i - 1][j - 1];
+                } else {
+                    dp[i][j] =
+                        1 +
+                        Math.min(
+                            dp[i - 1][j], // Eliminar
+                            dp[i][j - 1], // Insertar
+                            dp[i - 1][j - 1], // Reemplazar
+                        );
+                }
+            }
+        }
+
+        return dp[m][n];
+    }
+
+    function calculateSimilarity(str1: string, str2: string): number {
+        const maxLen = Math.max(str1.length, str2.length);
+        if (maxLen === 0) return 1;
+
+        const distance = levenshteinDistance(str1, str2);
+        return 1 - distance / maxLen;
+    }
+
+    function fuzzyMatch(
+        searchTerm: string,
+        text: string,
+        threshold: number = 0.65,
+    ): boolean {
+        const normalizedSearch = searchTerm.toLowerCase().trim();
+        const normalizedText = text.toLowerCase().trim();
+
+        if (normalizedText.includes(normalizedSearch)) {
+            return true;
+        }
+
+        if (normalizedSearch.length <= 2) {
+            return false;
+        }
+
+        const textWords = normalizedText.split(/\s+/);
+        const searchWords = normalizedSearch.split(/\s+/);
+
+        return searchWords.every((searchWord) => {
+            if (textWords.some((textWord) => textWord.includes(searchWord))) {
+                return true;
+            }
+
+            return textWords.some((textWord) => {
+                const dynamicThreshold =
+                    searchWord.length <= 4 ? 0.7 : threshold;
+                const similarity = calculateSimilarity(searchWord, textWord);
+                return similarity >= dynamicThreshold;
+            });
+        });
+    }
+
+    function searchProducts(
+        searchTerm: string,
+        items: NodeListOf<Element>,
+    ): Element[] {
+        const results: { element: Element; score: number }[] = [];
+        const normalizedSearch = searchTerm.toLowerCase().trim();
+
+        items.forEach((item) => {
+            const itemName = item.getAttribute("data-name") || "";
+
+            if (fuzzyMatch(normalizedSearch, itemName)) {
+                let score = 0;
+
+                // Coincidencia exacta tiene mayor peso
+                if (itemName.includes(normalizedSearch)) {
+                    score = 100;
+                } else if (itemName.startsWith(normalizedSearch)) {
+                    score = 90;
+                } else {
+                    // Usar similitud como score
+                    const words = itemName.split(/\s+/);
+                    const searchWords = normalizedSearch.split(/\s+/);
+
+                    let maxSimilarity = 0;
+                    searchWords.forEach((sw) => {
+                        words.forEach((w) => {
+                            const sim = calculateSimilarity(sw, w);
+                            if (sim > maxSimilarity) maxSimilarity = sim;
+                        });
+                    });
+                    score = maxSimilarity * 80;
+                }
+
+                results.push({ element: item, score });
+            }
+        });
+
+        // Ordenar por relevancia
+        results.sort((a, b) => b.score - a.score);
+
+        return results.map((r) => r.element);
+    }
+
+    declare global {
+        interface Window {
+            fuzzySearch: {
+                levenshteinDistance: typeof levenshteinDistance;
+                calculateSimilarity: typeof calculateSimilarity;
+                fuzzyMatch: typeof fuzzyMatch;
+                searchProducts: typeof searchProducts;
+            };
+        }
+    }
+
+    window.fuzzySearch = {
+        levenshteinDistance,
+        calculateSimilarity,
+        fuzzyMatch,
+        searchProducts,
+    };
+</script>
