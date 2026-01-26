@@ -11,7 +11,7 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()]
   },
-  site: 'https://pura-esencia.vercel.app',
+  site: 'https://www.pura-esencia.vercel.app',
   integrations: [ sitemap()],
   adapter: vercel(),
   image: {
