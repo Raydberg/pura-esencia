@@ -4,7 +4,6 @@ import "../styles/global.css";
 import Header from "../shared/components/Header.astro";
 import Footer from "../shared/components/Footer.astro";
 import WhatsAppButton from "../shared/components/WhatsAppButton.astro";
-import Analytics from "@vercel/analytics/astro";
 interface Props {
 	title: string;
 	description?: string;
@@ -17,6 +16,33 @@ const defaultDescription = "Pura Esencia - Cosmeticos de calidad";
 <!doctype html>
 <html lang="en">
 	<head>
+		<!-- <Analytics /> -->
+		<script is:inline>
+			window.dataLayer = window.dataLayer || [];
+			function gtag() {
+				dataLayer.push(arguments);
+			}
+
+			gtag("js", new Date());
+			gtag("config", "G-1SL6D45YNT", { send_page_view: false });
+
+			function trackPageView() {
+				gtag("event", "page_view", {
+					page_location: window.location.href,
+					page_path:
+						window.location.pathname + window.location.search,
+					page_title: document.title,
+				});
+			}
+
+			// primera carga (Astro)
+			document.addEventListener("astro:page-load", trackPageView);
+
+			// navegación con view transitions
+			document.addEventListener("astro:after-swap", () =>
+				setTimeout(trackPageView, 0),
+			);
+		</script>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -61,33 +87,6 @@ const defaultDescription = "Pura Esencia - Cosmeticos de calidad";
 			async
 			src="https://www.googletagmanager.com/gtag/js?id=G-1SL6D45YNT"
 		></script>
-		<!-- <Analytics /> -->
-		<script is:inline>
-			window.dataLayer = window.dataLayer || [];
-			function gtag() {
-				dataLayer.push(arguments);
-			}
-
-			gtag("js", new Date());
-			gtag("config", "G-1SL6D45YNT", { send_page_view: false });
-
-			function trackPageView() {
-				gtag("event", "page_view", {
-					page_location: window.location.href,
-					page_path:
-						window.location.pathname + window.location.search,
-					page_title: document.title,
-				});
-			}
-
-			// primera carga (Astro)
-			document.addEventListener("astro:page-load", trackPageView);
-
-			// navegación con view transitions
-			document.addEventListener("astro:after-swap", () =>
-				setTimeout(trackPageView, 0),
-			);
-		</script>
 
 		<script is:inline>
 			function applyTheme() {
