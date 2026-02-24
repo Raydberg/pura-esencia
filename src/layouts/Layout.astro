@@ -107,7 +107,6 @@ const defaultDescription = "Pura Esencia - Cosmeticos de calidad";
 			crossorigin="anonymous"></script>
 		<script is:inline>
 			document.addEventListener("astro:page-load", () => {
-				// Eliminar el script anterior si existe
 				const oldScript = document.querySelector(
 					'script[src*="adsbygoogle.js"]',
 				);
@@ -115,7 +114,6 @@ const defaultDescription = "Pura Esencia - Cosmeticos de calidad";
 					oldScript.remove();
 				}
 
-				// Recargar el script de AdSense
 				const script = document.createElement("script");
 				script.src =
 					"https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3862830450249950";
