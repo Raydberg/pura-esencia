@@ -101,26 +101,43 @@ const defaultDescription = "Pura Esencia - Cosmeticos de calidad";
 			applyTheme();
 			document.addEventListener("astro:after-swap", applyTheme);
 		</script>
-		<script
-			async
-			src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3862830450249950"
-			crossorigin="anonymous"></script>
 		<script is:inline>
-			document.addEventListener("astro:page-load", () => {
-				const oldScript = document.querySelector(
-					'script[src*="adsbygoogle.js"]',
-				);
-				if (oldScript) {
-					oldScript.remove();
+			(function () {
+				const ADSENSE_SRC =
+					"https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3862830450249950";
+
+				function loadAdSense() {
+					const script = document.createElement("script");
+					script.src = ADSENSE_SRC;
+					script.async = true;
+					script.crossOrigin = "anonymous";
+					document.head.appendChild(script);
 				}
 
-				const script = document.createElement("script");
-				script.src =
-					"https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3862830450249950";
-				script.async = true;
-				script.crossOrigin = "anonymous";
-				document.head.appendChild(script);
-			});
+				// Carga inicial
+				loadAdSense();
+
+				// Antes del swap: limpiar todo lo que AdSense inyectó
+				document.addEventListener("astro:before-swap", () => {
+					document
+						.querySelectorAll(
+							'ins.adsbygoogle, iframe[id^="aswift_"], iframe[id^="google_ads_"], .adsbygoogle-noablate',
+						)
+						.forEach((el) => el.remove());
+
+					document
+						.querySelectorAll('script[src*="adsbygoogle"]')
+						.forEach((s) => s.remove());
+
+					window.adsbygoogle = [];
+				});
+
+				// Después de la navegación: re-cargar AdSense
+				document.addEventListener("astro:after-swap", () => {
+					window.adsbygoogle = window.adsbygoogle || [];
+					loadAdSense();
+				});
+			})();
 		</script>
 	</head>
 	<body>
