@@ -35,10 +35,8 @@ const defaultDescription = "Pura Esencia - Cosmeticos de calidad";
 				});
 			}
 
-			// primera carga (Astro)
 			document.addEventListener("astro:page-load", trackPageView);
 
-			// navegación con view transitions
 			document.addEventListener("astro:after-swap", () =>
 				setTimeout(trackPageView, 0),
 			);
@@ -84,6 +82,7 @@ const defaultDescription = "Pura Esencia - Cosmeticos de calidad";
 			rel="stylesheet"
 		/>
 		<script
+			type="text/partytown"
 			async
 			src="https://www.googletagmanager.com/gtag/js?id=G-1SL6D45YNT"
 		></script>
@@ -106,6 +105,25 @@ const defaultDescription = "Pura Esencia - Cosmeticos de calidad";
 			async
 			src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3862830450249950"
 			crossorigin="anonymous"></script>
+		<script is:inline>
+			document.addEventListener("astro:page-load", () => {
+				// Eliminar el script anterior si existe
+				const oldScript = document.querySelector(
+					'script[src*="adsbygoogle.js"]',
+				);
+				if (oldScript) {
+					oldScript.remove();
+				}
+
+				// Recargar el script de AdSense
+				const script = document.createElement("script");
+				script.src =
+					"https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3862830450249950";
+				script.async = true;
+				script.crossOrigin = "anonymous";
+				document.head.appendChild(script);
+			});
+		</script>
 	</head>
 	<body>
 		<Header />

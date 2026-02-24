@@ -6,13 +6,22 @@ import vercel from '@astrojs/vercel';
 
 import sitemap from '@astrojs/sitemap';
 
+import partytown from "@astrojs/partytown";
+
 // https://astro.build/config
 export default defineConfig({
   vite: {
     plugins: [tailwindcss()]
   },
   site: 'https://www.pura-esencia.vercel.app',
-  integrations: [ sitemap()],
+  integrations: [
+    sitemap(),
+    partytown({
+      config: {
+        forward: ['dataLayer.push'],
+      },
+    }),
+  ],
   adapter: vercel(),
   image: {
     remotePatterns: [
