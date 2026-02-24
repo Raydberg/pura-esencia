@@ -276,7 +276,7 @@ const isNew =
 </Layout>
 
 <script>
-    document.addEventListener("astro:page-load", () => {
+    (() => {
         const mainImage = document.getElementById(
             "main-image",
         ) as HTMLImageElement;
@@ -314,7 +314,7 @@ const isNew =
                 }
             });
         });
-    });
+    })();
 </script>
 
 <style>

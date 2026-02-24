@@ -85,7 +85,7 @@ const { products } = Astro.props;
 </style>
 
 <script>
-    document.addEventListener("astro:page-load", () => {
+    (() => {
         const container = document.getElementById("carousel-container");
         const prevBtn = document.getElementById("prev-slide");
         const nextBtn = document.getElementById("next-slide");
@@ -101,5 +101,5 @@ const { products } = Astro.props;
         nextBtn.addEventListener("click", () => {
             container.scrollBy({ left: scrollAmount, behavior: "smooth" });
         });
-    });
+    })();
 </script>

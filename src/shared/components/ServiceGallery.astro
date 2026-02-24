@@ -230,7 +230,6 @@ const { images, serviceName } = Astro.props;
         });
     }
 
-    // Run on load and astro navigation
+    // Run on load
     setupGalleries();
-    document.addEventListener("astro:page-load", setupGalleries);
 </script>

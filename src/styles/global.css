@@ -246,3 +246,49 @@
         @apply bg-white/80 backdrop-blur-md;
     }
 }
+
+/* ===== Cross-Document View Transitions (MPA mode) ===== */
+/* Habilita transiciones suaves entre páginas sin JavaScript */
+@view-transition {
+    navigation: auto;
+}
+
+/* Animación de salida: la página vieja se desvanece */
+::view-transition-old(root) {
+    animation: fade-out 0.2s ease-in forwards,
+               slide-out 0.2s ease-in forwards;
+}
+
+/* Animación de entrada: la página nueva aparece */
+::view-transition-new(root) {
+    animation: fade-in-vt 0.3s ease-out forwards,
+               slide-in 0.3s ease-out forwards;
+}
+
+@keyframes fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes fade-in-vt {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slide-out {
+    from { transform: translateY(0); }
+    to { transform: translateY(-8px); }
+}
+
+@keyframes slide-in {
+    from { transform: translateY(8px); }
+    to { transform: translateY(0); }
+}
+
+/* Respetar preferencias de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+        animation: none;
+    }
+}
