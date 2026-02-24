@@ -13,7 +13,7 @@ import Skincare from "../icons/Skincare.astro";
 const { data: dbCategories } = await supabase
     .from("categories")
     .select("id, name")
-    .limit(4); 
+    .limit(4);
 
 const categories = (dbCategories || []).map((cat) => {
     const normalized = cat.name
@@ -73,6 +73,7 @@ const categories = (dbCategories || []).map((cat) => {
                 categories.map((cat) => (
                     <a
                         href={`/products?categoria=${cat.id}`}
+                        data-astro-reload
                         class="group bg-card hover:bg-primary/5 rounded-xl p-6 text-center border border-border/50 hover:border-primary/30 transition-all hover:shadow-lg hover:-translate-y-1 duration-300 flex flex-col items-center justify-center gap-3"
                     >
                         <div class="text-primary w-10 h-10 group-hover:scale-110 transition-transform duration-300">

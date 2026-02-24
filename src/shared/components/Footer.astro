@@ -18,9 +18,9 @@ const { data: categories } = await supabase
             <div>
                 <a
                     href="/"
+                    data-astro-reload
                     class="flex items-center gap-2 mb-4 justify-center md:justify-start"
                 >
-                   
                     <span
                         class="font-sans text-xl font-semibold text-foreground"
                     >
@@ -28,8 +28,8 @@ const { data: categories } = await supabase
                     </span>
                 </a>
                 <p class="text-sm text-muted-foreground">
-                    Tu destino para productos de belleza. Calidad
-                    y elegancia en cada detalle.
+                    Tu destino para productos de belleza. Calidad y elegancia en
+                    cada detalle.
                 </p>
             </div>
 
@@ -39,6 +39,7 @@ const { data: categories } = await supabase
                     <li>
                         <a
                             href="/"
+                            data-astro-reload
                             class="font-sans text-sm text-muted-foreground hover:text-primary transition-colors"
                         >
                             Inicio
@@ -47,12 +48,12 @@ const { data: categories } = await supabase
                     <li>
                         <a
                             href="/products"
+                            data-astro-reload
                             class="font-sans text-sm text-muted-foreground hover:text-primary transition-colors"
                         >
                             Catálogo
                         </a>
                     </li>
-                    
                 </ul>
             </div>
 
@@ -64,6 +65,7 @@ const { data: categories } = await supabase
                             <li>
                                 <a
                                     href={`/products?categoria=${category.id}`}
+                                    data-astro-reload
                                     class="font-sans text-sm text-muted-foreground hover:text-primary transition-colors capitalize"
                                 >
                                     {category.name}
@@ -83,9 +85,8 @@ const { data: categories } = await supabase
                 <HeartIcon
                     class="w-4 h-4 text-primary fill-primary animate-pulse"
                 />
-                por <a
-                    href="https://raydberg.com"
-                    class="underline">Raydberg Chuquival</a
+                por <a href="https://raydberg.com" class="underline"
+                    >Raydberg Chuquival</a
                 >
             </p>
         </div>
